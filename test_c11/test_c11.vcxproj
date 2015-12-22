@@ -103,13 +103,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>d:\boost_1_55_0;gtest\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>e:\boost_1_55_0;gtest\include</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_WIN32_WINNT=0x0501 -D_WINSOCK_DEPRECATED_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>d:\boost_1_55_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>e:\boost_1_55_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -160,6 +160,7 @@
     <ClInclude Include="test_template.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="test_boost.cpp" />
     <ClCompile Include="test_coroutine.cpp" />
     <ClCompile Include="test_leetcode.cpp" />
     <ClCompile Include="test_moderncpp.cpp" />

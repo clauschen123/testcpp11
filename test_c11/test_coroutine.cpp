@@ -2,6 +2,9 @@
 #include <boost/bind.hpp>
 #include <boost/asio/yield.hpp>
 #include <iostream>
+
+//从VS的x64命令行进去编译bjam，b2
+//b2 address-model=64 --toolset=msvc-12.0 --with-coroutine debug
 #if 0
 namespace Coroutine{
     int foo(boost::asio::coroutine& ct)
