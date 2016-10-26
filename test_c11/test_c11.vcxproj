@@ -162,6 +162,7 @@
   <ItemGroup>
     <ClCompile Include="test_boost.cpp" />
     <ClCompile Include="test_coroutine.cpp" />
+    <ClCompile Include="test_json.cpp" />
     <ClCompile Include="test_leetcode.cpp" />
     <ClCompile Include="test_moderncpp.cpp" />
     <ClCompile Include="test_simubind.cpp" />

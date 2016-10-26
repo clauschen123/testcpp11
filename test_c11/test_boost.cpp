@@ -11,6 +11,18 @@ const char * say_what(bool b) { return b ? "true" : "false"; }
 
 void boost_main()
 {
+    vector<int> v1 = { 1, 2,3,4,5};
+    vector<int> v2(10,2);
+
+    auto end = v1.end();
+    if (v1.size() > 3)
+        end = v1.begin() +3;
+    v2.assign(v1.begin(), end);
+    v2.assign(v1.begin(), v1.end());
+
+    auto it = find(v1.begin(), v1.end(), 4);
+    unsigned char idx = unsigned char(distance(v1.begin(), it)) + 1;
+
     int argc = 1;
     char* argv = "d://psiphon3.exe";
 

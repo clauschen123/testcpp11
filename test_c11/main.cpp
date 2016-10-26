@@ -30,12 +30,12 @@ void leetcode_main();
 void morderncpp_main();
 void coroutine_main();
 void boost_main();
-
-using namespace std;
+void json_main();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    boost_main();
+    json_main();
+
 	::system("pause");
 	return 0;
 }

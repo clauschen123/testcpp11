@@ -178,8 +178,8 @@ void test1()
 	typedef void (CA<int>::*push_ptr)(int n);
 
 	CA<int>  ca;
-	cout << std::hex <<&CA<int>::push << endl;
-	cout << std::hex <<&CA<int>::push2 << endl;
+	cout << std::hex << &CA<int>::push << endl;
+	cout << std::hex << &CA<int>::push2 << endl;
 	printf("push addr: 0x%08lx\n", &CA<int>::push);
 	printf("push addr: 0x%08lx\n", &CA<float>::push);
 	printf("push addr: 0x%08lx\n", &CA<int>::push3);

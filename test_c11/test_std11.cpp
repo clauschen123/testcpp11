@@ -16,8 +16,13 @@ namespace algo
 {
     struct demo_t
     {
+        int id;
         int m;
         int n;
+        demo_t() = default;
+        demo_t(int _id, int _m, int _n) :id(_id), m(_m), n(_n)
+        {
+        }
 
         //     demo_t operator+ (const demo_t& item)
         //     {
@@ -30,6 +35,14 @@ namespace algo
         //     {
         //         return (*this) + item;
         //     }
+        bool operator== (const demo_t& right)
+        {
+            return id == right.id;
+        }
+        bool operator< (const demo_t& right)
+        {
+            return id < right.id;
+        }
     };
 
     inline demo_t operator+ (const demo_t& l, const demo_t& r)
@@ -261,10 +274,10 @@ namespace algo
 //             istream_iterator<string>(),            // end of source
 //             ostream_iterator<string>(cout, "\n"));  // destination
     }
+
     void main6()
     {
         cout << "\n------ " << __FUNCTION__ << ": count -------------" << endl;
-
         vector<int> coll;
         int num;
         INSERT_ELEMENTS(coll, 1, 9);
@@ -1710,19 +1723,41 @@ namespace algo
     void main43()
     {
         cout << "\n------ " << __FUNCTION__ << ": unique/ unique_copy -------------" << endl;
+
+        vector<demo_t> vdemo;
+        vdemo.push_back(demo_t(1 ,1 ,0));
+        vdemo.push_back(demo_t(2, 2, 0));
+        vdemo.push_back(demo_t(1, 3, 0));
+        vdemo.push_back(demo_t(2, 4, 0));
+        sort(vdemo.begin(), vdemo.end());
+
+        auto pos1 = unique(vdemo.begin(), vdemo.end()
+            , []( demo_t& l,  demo_t& r)
+            { return l.id == r.id; }
+        );
+        if (pos1 == vdemo.end())
+            cout << " No unique elem" << endl;
+        else
+        {
+
+        }
+
         // source data
-        int source[] = { 1, 4, 4, 6, 1, 2, 2, 3, 1, 6, 6, 6, 5, 7,
-            5, 4, 4 };
-        list<int> coll;
+        int source[] = { 1, 4, 2 };
+        //list<int> coll;
+        vector<int> coll{ 1, 2, 1, 2 };
 
         // initialize coll with elements from source
-        copy(begin(source), end(source),         // source
-            back_inserter(coll));               // destination
+//         copy(begin(source), end(source),         // source
+//             back_inserter(coll));               // destination
         PRINT_ELEMENTS(coll);
 
         // remove consecutive duplicates
         auto pos = unique(coll.begin(), coll.end());
-
+        if (pos == coll.end())
+            cout << " No unique elem" << endl;
+        else
+            cout << " Have unique elem" << endl;
         // print elements not removed
         // - use new logical end
         copy(coll.begin(), pos,                  // source
@@ -1742,8 +1777,7 @@ namespace algo
 
         {
             // source data
-            int source[] = { 1, 4, 4, 6, 1, 2, 2, 3, 1, 6, 6, 6, 5, 7,
-                5, 4, 4 };
+            int source[] = { 1, 4, 4, 6, 1, 2, 2, 3, 1, 6, 6, 6, 5, 7, 5, 4, 4 };
 
             // initialize coll with elements from source
             list<int> coll;
@@ -1768,10 +1802,10 @@ namespace algo
 
             // copy standard input to standard output
             // - while compressing spaces
-            unique_copy(istream_iterator<char>(cin),  // beginning of source: cin
-                istream_iterator<char>(),     // end of source: end-of-file
-                ostream_iterator<char>(cout), // destination: cout
-                bothSpaces);                  // duplicate criterion
+//             unique_copy(istream_iterator<char>(cin),  // beginning of source: cin
+//                 istream_iterator<char>(),     // end of source: end-of-file
+//                 ostream_iterator<char>(cout), // destination: cout
+//                 bothSpaces);                  // duplicate criterion
         }
     }
 
@@ -1844,13 +1878,15 @@ namespace async_
     {
         // random-number generator (use c as seed to get different sequences)
         std::default_random_engine dre(c);
+        dre.seed(time(nullptr));
         std::uniform_int_distribution<int> id(10, 1000);
 
+        cout << id(dre) << endl;
         // loop to print character after a random period of time
-        for (int i = 0; i < 10; ++i) {
-            this_thread::sleep_for(chrono::milliseconds(id(dre)));
-            cout.put(c).flush();
-        }
+//         for (int i = 0; i < 10; ++i) {
+//             this_thread::sleep_for(chrono::milliseconds(id(dre)));
+//             cout.put(c).flush();
+//         }
 
         return c;
     }
@@ -2277,6 +2313,7 @@ namespace async_
 
 void std11_main()
 {
+    async_::doSomething('+');
 //     algo::main0();
 //     algo::main1();
 //     algo::main2();
@@ -2300,7 +2337,7 @@ void std11_main()
 //     algo::main20();
 //     algo::main21();
 //     algo::main22();
-//     algo::main23();
+//      algo::main23();
 //     algo::main24();
 //     algo::main25();
 //     algo::main26();
@@ -2320,8 +2357,8 @@ void std11_main()
 //     algo::main40();
 //     algo::main41();
 //     algo::main42();
-//     algo::main43();
-    algo::main44();
+//      algo::main43();
+//      algo::main44();
 
 //     async_::test();
 //     async_::main0();

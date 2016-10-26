@@ -714,10 +714,59 @@ namespace AA{
         test(a);
         cout << "a is " << a;
     }
-
 }
+
+namespace {
+    void main()
+    {
+        int b = 1;
+        try{
+            int l = 1 / b;
+        }
+        catch (const char* e)
+        {
+            cout << "catch string: " << e;
+        }
+        catch (std::exception& e)
+        {
+            cout << "catch std::exception: " << e.what();
+        }
+        catch (...)
+        {
+            cout << "catch unknown exception!";
+        }
+    }
+}
+
+namespace Test_shared{
+
+    struct demo{
+        int val;
+        demo(int v): val(v) { 
+            std::cout << "demo()," 
+                << "0x" << std::hex << this 
+                << "," << val 
+                << std::endl; 
+        }
+        ~demo() {
+            std::cout << "~demo(), " 
+                << val 
+                << std::endl; 
+        }
+    };
+    void main() {
+        shared_ptr<demo> v2 = make_shared<demo>(100);
+        shared_ptr<demo> v3 = make_shared<demo>(200);
+
+        shared_ptr<demo> v1(new demo(1));
+    }
+}
+
 void other_main()
 {
+    Test_shared::main();
+
+    main();
     AA::main();
     UINT8 a = 1, b = 2;
     int h = (a - b);
@@ -725,17 +774,9 @@ void other_main()
     
     auto hurt = CalcHurtByStar(934, 2, 1);
     hurt = CalcHurtByStar(934, 2, 3);
+
     ///////////////////////////////////
     unsigned int i = unsigned long long(1000212) * 10000 / 10000 + 0;
-
-    //////////////////////////////////////////////
-//     vector< SFmlyWarPlyPaticipate > v;
-//     {
-//         v.emplace_back(SFmlyWarPlyPaticipate(1, nullptr));
-//         v.emplace_back(SFmlyWarPlyPaticipate(2, nullptr));
-//         v.push_back(SFmlyWarPlyPaticipate(3, nullptr));
-//         v.push_back(SFmlyWarPlyPaticipate(4, nullptr));
-//     }
 
     vector< shared_ptr<SFmlyWarPlyPaticipate> > v1, v2;
     {
@@ -769,8 +810,8 @@ void other_main()
     plyset.emplace(
         player->GetCreatureID(),
         bind(&CPlayer::dosth, player));
-    ///////////////////////////////////
 
+    ///////////////////////////////////
     Work::main5();
     other::test();
 
