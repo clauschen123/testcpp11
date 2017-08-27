@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <exception>
 #include <deque>
 #include <list>
@@ -17,6 +18,18 @@
 #include <ios>
 
 #define STRINGFY_LIST(...) #__VA_ARGS__
+
+// typedef char INT8;
+// typedef short INT16;
+// typedef int INT32;
+// typedef long LONG;
+// typedef int64_t INT64;
+// 
+// typedef unsigned char UINT8;
+// typedef unsigned short UINT16;
+// typedef unsigned int UINT32;
+// typedef unsigned long ULONG;
+// typedef uint64_t UINT64;
 
 namespace ajson
 {
@@ -92,6 +105,7 @@ namespace ajson
       while (*info != 0)
       {
         ++info;
+        std::cout << "claus: " << pre << std::endl;
         if (is_ws(*info))
         {
           add_filed(pre, info, fileds);
@@ -866,7 +880,7 @@ namespace ajson
     }
   };
 
-  typedef ajson_string_stream<std::allocator<char> > string_stream;
+  typedef ajson_string_stream<std::allocator<char> > json_stream;
 
   struct ajson_file_stream
   {
@@ -1649,7 +1663,7 @@ namespace ajson
   }
 
   template<typename ty>
-  inline void load_from_buff(ty& val, char * buff, size_t len = -1)
+  inline void json_decode(ty& val, char * buff, size_t len = -1)
   {
     reader rd(buff, len);
     json_impl<ty>::read(rd, val);
@@ -1724,7 +1738,7 @@ namespace ajson
   }
 
   template<typename ty, typename stream_ty, class write_tp = lite_write<stream_ty> >
-  inline void save_to(stream_ty& ss, ty& val)
+  inline void json_encode(stream_ty& ss, ty& val)
   {
     write_tp wt(ss);
     json_impl<ty>::write(wt, val);
@@ -1734,7 +1748,7 @@ namespace ajson
   inline void save_to_file(ty& val, char const * filename)
   {
     stream_ty fs(filename);
-    save_to < ty, stream_ty, write_tp>(fs, val);
+    json_encode < ty, stream_ty, write_tp>(fs, val);
   }
 }
 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <map>
 #include <set>
+#include <thread>
 #include <unordered_map>
 #include <boost/progress.hpp>
 
@@ -761,9 +762,18 @@ namespace Test_shared{
         shared_ptr<demo> v1(new demo(1));
     }
 }
-
+namespace Thread {
+    void main()
+    {
+        thread server_thread([](){
+            //Start WS-server
+            cout<<"thread start()" <<endl;
+        });
+    }
+}
 void other_main()
 {
+    Thread::main();
     Test_shared::main();
 
     main();
