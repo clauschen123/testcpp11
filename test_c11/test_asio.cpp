@@ -1,7 +1,8 @@
-#ifdef WIN32
-#define _WIN32_WINNT 0x0501
+//#ifdef WIN32
+//#define _WIN32_WINNT 0x0501
 #include <stdio.h>
-#endif
+//#endif
+#include <iostream>
 
 
 #include <boost/thread.hpp>
