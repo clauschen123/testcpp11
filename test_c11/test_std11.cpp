@@ -2313,7 +2313,7 @@ namespace async_
 
 void std11_main()
 {
-    async_::doSomething('+');
+//     async_::doSomething('+');
 //     algo::main0();
 //     algo::main1();
 //     algo::main2();
@@ -2327,7 +2327,7 @@ void std11_main()
 //     algo::main10();
 //     algo::main11();
 //     algo::main12();
-//     algo::main13();
+     algo::main13();
 //     algo::main14();
 //     algo::main15();
 //     algo::main16();
