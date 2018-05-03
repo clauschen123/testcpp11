@@ -1,6 +1,6 @@
 // test_c11.cpp : 定义控制台应用程序的入口点。
 #include "stdafx.h"
-#include "perftimer.h"
+// #include "perftimer.h"
 
 #include <iostream>
 #include <vector>
@@ -39,7 +39,7 @@ void json_main();
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    boost_main();
+    asio_main();
 
 	::system("pause");
 	return 0;

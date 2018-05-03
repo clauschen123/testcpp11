@@ -160,7 +160,6 @@
     <ClInclude Include="test_template.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="mi_sample1.cpp" />
     <ClCompile Include="test_boost.cpp" />
     <ClCompile Include="test_coroutine.cpp" />
     <ClCompile Include="test_json.cpp" />
