@@ -37,11 +37,19 @@ void coroutine_main();
 void boost_main();
 void json_main();
 
+#include <thread>
+std::thread t;
+
+void thread_func() {
+    for (int i = 0; i < 100000000; ++i);
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
     asio_main();
 
 	::system("pause");
+
 	return 0;
 }
 

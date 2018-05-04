@@ -146,15 +146,22 @@ namespace ping {
     class pinger
     {
     public:
-        pinger(boost::asio::io_service& io_service, const char* destination, int ping_count=2)
-            : io_service_(io_service), resolver_(io_service), socket_(io_service, icmp::v4())
-            , timer_(io_service), sequence_number_(0), num_replies_(0), ping_count_(ping_count)
+        pinger( const char* destination, int ping_count = 10)
+            : resolver_(io_service_), socket_(io_service_, icmp::v4())
+            , timer_(io_service_), sequence_number_(0), num_replies_(0), ping_count_(ping_count)
         {
             icmp::resolver::query query(icmp::v4(), destination, "");
             destination_ = *resolver_.resolve(query);
 
             start_send();
             start_receive();
+        }
+
+        time_t detect() 
+        {
+            io_service_.run();
+            return ping_intval();
+
         }
 
     private:
@@ -178,7 +185,6 @@ namespace ping {
             // Send the request.
             time_sent_ = posix_time::microsec_clock::universal_time();
             socket_.send_to(request_buffer.data(), destination_);
-            std::cout <<">>>> Send at " << (time_sent_) << std::endl;
 
             // Wait up to five seconds for a reply.
             //num_replies_ = 0;
@@ -188,23 +194,12 @@ namespace ping {
 
         void handle_timeout( const boost::system::error_code& err)
         {
-            if (err) {
-                auto now = posix_time::microsec_clock::universal_time();
-                std::cout << "Request timed out, replies=" << num_replies_ << ",at time:" << now << std::endl;
-            }
-            else {
-                std::cout << "Request timed out, not err " << std::endl;
-            }
-
-            //if (num_replies_ == 0)
-
-            if (false) {
-                timer_.cancel();
+            if (!err) {
+                posix_time::ptime now = posix_time::microsec_clock::universal_time();
+                std::cout << "handle_timeout,err " << (err ? "true " : "false ") << now << std::endl;
                 io_service_.stop();
-                return;
             }
-
-            if (!should_end()) {
+            else if (!should_end()) {
                 // Requests must be sent no less than one second apart.
                 timer_.expires_at(time_sent_ + posix_time::seconds(1));
                 timer_.async_wait(boost::bind(&pinger::start_send, this));
@@ -213,8 +208,6 @@ namespace ping {
 
         void start_receive()
         {
-            std::cout << "----------Start receive " << std::endl;
-
             // Discard any data already in the buffer.
             reply_buffer_.consume(reply_buffer_.size());
 
@@ -243,30 +236,22 @@ namespace ping {
                 && icmp_hdr.sequence_number() == sequence_number_)
             {
                 // If this is the first reply, interrupt the five second timeout.
-                if (num_replies_++ == 0) {
-                    std::cout << " cancel timer replyes:"<< num_replies_ 
-                        <<",now:" << posix_time::microsec_clock::universal_time() 
-                        << std::endl;
-                    timer_.cancel();
-                }
+                posix_time::ptime now = posix_time::microsec_clock::universal_time();
+                std::cout << "num_replies=" << num_replies_ << ", now=" << now << std::endl;
+
+                ++num_replies_;
+                timer_.cancel();
 
                 // Print out some information about the reply packet.
-                posix_time::ptime now = posix_time::microsec_clock::universal_time();
+                int64_t this_intval = (now - time_sent_).total_microseconds();
+                ping_intval_ += this_intval;
+
                 std::cout << length - ipv4_hdr.header_length()
                     << " bytes from " << ipv4_hdr.source_address()
                     << ": icmp_seq=" << icmp_hdr.sequence_number()
                     << ", ttl=" << ipv4_hdr.time_to_live()
-                    << ", time=" << (now - time_sent_).total_milliseconds() << " ms"
-                    << ", replies=" << num_replies_ 
+                    << ", time=" << this_intval << " ms"
                     << std::endl;
-
-                int64_t this_intval = (now - time_sent_).total_milliseconds();
-                if (ping_intval_ == 0) {
-                    ping_intval_ = this_intval;
-                }
-                else {
-                    ping_intval_ = (ping_intval_ + this_intval) / 2;
-                }
             }
             if (should_end()) {
                 io_service_.stop();
@@ -275,11 +260,8 @@ namespace ping {
             start_receive();
         }
 
-        bool should_end() 
-        {
-            //std::cout << "replyes:" << num_replies_ << ", ping count:" << ping_count_ << std::endl;
-            return num_replies_ >= ping_count_;
-        }
+        bool should_end() { return num_replies_ >= ping_count_; }
+        time_t ping_intval() { return ping_intval_ / ping_count_; }
 
         static unsigned short get_identifier()
         {
@@ -290,7 +272,7 @@ namespace ping {
 #endif
         }
 
-        boost::asio::io_service& io_service_;
+        boost::asio::io_service io_service_;
         icmp::resolver resolver_;
         icmp::endpoint destination_;
         icmp::socket socket_;
@@ -299,18 +281,15 @@ namespace ping {
         posix_time::ptime time_sent_;
         boost::asio::streambuf reply_buffer_;
         std::size_t num_replies_;
-        int ping_count_ = 0;
+        int ping_count_ = 10;
         time_t ping_intval_ = 0;
     };
 
     int main() {
         try
         {
-            boost::asio::io_service io_service;
-            pinger p(io_service, "127.0.0.1");
-            io_service.run();
-
-            std::cout << " ios run exit!" << std::endl;
+            //pinger p("www.baidu.com");
+            std::cout << " ping result:" << pinger("192.157.208.178").detect() << std::endl;
         }
         catch (std::exception& e)
         {
