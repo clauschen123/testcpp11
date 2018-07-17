@@ -10,6 +10,8 @@
 */
 
 #include "test_std11.hpp"
+#include <boost/progress.hpp>
+
 using namespace std;
 
 namespace algo
@@ -1883,10 +1885,10 @@ namespace async_
 
         cout << id(dre) << endl;
         // loop to print character after a random period of time
-//         for (int i = 0; i < 10; ++i) {
-//             this_thread::sleep_for(chrono::milliseconds(id(dre)));
-//             cout.put(c).flush();
-//         }
+        for (int i = 0; i < 10; ++i) {
+            this_thread::sleep_for(chrono::milliseconds(id(dre)));
+            cout.put(c).flush();
+        }
 
         return c;
     }
@@ -1911,6 +1913,7 @@ namespace async_
         // start func1() asynchronously (now or later or never):
         std::future<int> result1(std::async(func1));
 
+        cout << "Get result2 of func2..." << endl;
         int result2 = func2();    // call func2() synchronously (here and now)
 
         // print result (wait for func1() to finish and add its result to result2
@@ -1925,8 +1928,9 @@ namespace async_
         // - will sooner or later raise an exception
         // - BEWARE: this is bad practice
         list<int> v;
+        cout << "task1: current thread id: " << this_thread::get_id() << endl;
         while (true) {
-            for (int i = 0; i < 1000000; ++i) {
+            for (int i = 0; i < 10000; ++i) {
                 v.push_back(i);
             }
             cout.put('.').flush();
@@ -1947,6 +1951,8 @@ namespace async_
 
         cout << "\nwait for the end of task1: " << endl;
         try {
+            cout << "main1: current thread id: " << this_thread::get_id() << endl;
+
             f1.get();  // wait for task1() to finish (raises exception if any)
         }
         catch (const exception& e) {
@@ -2309,57 +2315,117 @@ namespace async_
         int x = myFuture.get();//线程还可以在执行一些其它操作，直到其想获取task的结果时调用此语句  
         cout << " sub thread: " << x << endl;
     }
+
+    //////// How to check a thread is end ///////////////////
+    template<typename T>
+    static T random()
+    {
+        std::random_device rd;
+        std::mt19937 generator(rd());
+        return (T)generator();
+    }
+
+    atomic<int> total_thread_create(0);
+    atomic<int> total_thread_exit(0);
+    struct Writer {
+        bool _end = false;
+        int _id;
+        int count = 1;
+        std::thread* _thread = nullptr;
+        Writer(int c, int id) : count(c), _id(id) {
+            _thread = new thread(bind(&Writer::Action, this, id));
+            total_thread_create++;
+        }
+        ~Writer() {
+            _thread->join();
+            //         cout << "*****Thread " << _id << " exit and delete" << endl;
+            total_thread_exit++;
+            delete _thread;
+        }
+
+        void Action(int id) {
+            while (count--) {
+                random<int>();
+            }
+            //         cout << "******Writer_thread: " << id <<" all done" << endl;
+            _end = true;
+        }
+    };
+    vector<shared_ptr<Writer>> _writer_thread;
+    
+    // Test how to check a thread is end
+    void my_task() {
+        int count = 1000000;
+        while (count--) {
+            random<int>();
+            if (count % 10000 == 0) {
+                if (_writer_thread.empty() == false) {
+                    auto it = _writer_thread.begin();
+                    if ((*it)->_end == true) _writer_thread.erase(it);
+                }
+                _writer_thread.emplace_back(make_shared<Writer>(10000, count));
+            }
+        }
+        cout << "******my task all done,left thread count=" << _writer_thread.size() << endl;
+        cout << " thread create = " << total_thread_create << ", thread exit = " << total_thread_exit << endl;
+        _writer_thread.clear();
+        cout << " thread create = " << total_thread_create << ", thread exit = " << total_thread_exit << endl;
+
+    }
+    typedef uint32_t NonceType;
+    struct Rec {
+        NonceType c;
+        NonceType i1;
+        NonceType i2;
+        Rec(NonceType n1, NonceType n2, NonceType n3) : c(n1), i1(n2), i2(n3) {}
+        bool operator<(const Rec& rhs) const { return c < rhs.c; }
+        bool operator==(const Rec& rhs) const { return c == rhs.c; }
+
+        void print() { cout << "c:" << c << ",i1:" << i1 << ",i2" << i2 << endl; }
+    };
+    void my_sort() {
+        int count = 100000;
+        vector<Rec> v,v1, v2,v3;
+        while (count--) { 
+            v.emplace_back(random<uint32_t>(), random<uint32_t>(), random<uint32_t>());
+        }
+        {
+            v1 = v;
+            boost::progress_timer t;
+            std::sort(v1.begin(), v1.end());
+        }
+        {
+            v2 = v;
+            boost::progress_timer t;
+            std::stable_sort(v2.begin(), v2.end());
+            assert(v2 == v1);
+        }
+        {
+            v3 = v;
+            boost::progress_timer t;
+            std::qsort(&v3[0], v3.size(), sizeof Rec, [](const void* a, const void* b) {
+                const Rec* arg1 = static_cast<const Rec*>(a);
+                const Rec* arg2 = static_cast<const Rec*>(b);
+                if (arg1->c < arg2->c) return -1;
+                if (arg1->c > arg2->c) return 1;
+                return 0;
+            });
+            assert(v3 == v1);
+            assert(v3 == v2);
+
+            for (auto&r : v3) {
+                r.print();
+            }
+        }
+
+
+    }
 }
 
 void std11_main()
 {
+    async_::my_sort();
 //     async_::doSomething('+');
-//     algo::main0();
-//     algo::main1();
-//     algo::main2();
-//     algo::main3();
-//     algo::main4();
-//     algo::main5();
-//     algo::main6();
-//     algo::main7();
-//     algo::main8();
-//     algo::main9();
-//     algo::main10();
-//     algo::main11();
-//     algo::main12();
-     algo::main13();
-//     algo::main14();
-//     algo::main15();
-//     algo::main16();
-//     algo::main17();
-//     algo::main18();
-//     algo::main19();
-//     algo::main20();
-//     algo::main21();
-//     algo::main22();
-//      algo::main23();
-//     algo::main24();
-//     algo::main25();
-//     algo::main26();
-//     algo::main27();
-//     algo::main28();
-//     algo::main29();
-//     algo::main30();
-//     algo::main31();
-//     algo::main32();
-//     algo::main33();
-//     algo::main34();
-//     algo::main35();
-//     algo::main36();
-//     algo::main37();
-//     algo::main38();
-//     algo::main39();
-//     algo::main40();
-//     algo::main41();
-//     algo::main42();
-//      algo::main43();
-//      algo::main44();
-
 //     async_::test();
 //     async_::main0();
 //     async_::main1();
